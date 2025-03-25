@@ -17,10 +17,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.documents import Document
-
+import config
 # 환경변수 설정 및 토큰 로드
 load_dotenv()
-HF_TOKEN = os.getenv("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")
+HF_TOKEN = os.getenv(config.HF_TOKEN)
 EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 print("환경변수 및 HuggingFace 토큰 로드 완료")
 
