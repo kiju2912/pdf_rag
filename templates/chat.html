@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>챗팅 봇</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+    .chat-container {
+      width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    .chat-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 400px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+    .user-message { text-align: right; margin: 8px 0; }
+    .bot-message { text-align: left; margin: 8px 0; }
+    .download-link { font-size: 0.9em; color: blue; text-decoration: underline; }
+    .input-area { display: flex; }
+    .input-area input[type="text"] { flex: 1; padding: 5px; }
+    .input-area button { margin-left: 5px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2>챗팅 봇</h2>
+    <div id="chat-box" class="chat-box">
+      <!-- 메시지가 추가됩니다 -->
+    </div>
+    <form id="chat-form" class="input-area">
+      <input type="text" id="user-input" placeholder="메시지를 입력하세요..." required>
+      <button type="submit">전송</button>
+    </form>
+  </div>
+
+  <script>
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+
+    chatForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const message = userInput.value;
+      if (message.trim() === "") return;
+      appendMessage('user', message);
+      userInput.value = "";
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ query: message })
+        });
+        const data = await response.json();
+        if (data.error) {
+          appendMessage('bot', data.error);
+        } else {
+          // 기본 답변 추가
+          appendMessage('bot', data.answer);
+          // 만약 context 내에 source가 "sql"인 문서가 있다면, 다운로드 링크 추가
+          if (data.context && Array.isArray(data.context)) {
+            data.context.forEach(doc => {
+              console.log(data)
+              if (doc.metadata && doc.metadata.source === "sql" && doc.metadata.pdf_file_name) {
+                console.log("data")
+                // 다운로드 링크 URL: /download?file=<pdf_file_name>
+                const downloadUrl = `/download?file=${encodeURIComponent(doc.metadata.pdf_file_name)}`;
+                const linkText = doc.metadata.caption_name || "다운로드";
+                appendDownloadLink(linkText, downloadUrl);
+              }
+            });
+          }
+        }
+      } catch (error) {
+        appendMessage('bot', "서버 오류가 발생했습니다.");
+      }
+    });
+
+    function appendMessage(sender, text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+      messageDiv.textContent = text;
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendDownloadLink(linkText, url) {
+      const linkDiv = document.createElement('div');
+      linkDiv.classList.add('bot-message');
+      linkDiv.innerHTML = `<a href="${url}" class="download-link" target="_blank">${linkText} 다운로드</a>`;
+      chatBox.appendChild(linkDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>

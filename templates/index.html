@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF 등록</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+    .upload-container {
+      width: 400px;
+      margin: 100px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      text-align: center;
+    }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h2>챗팅 시작 전 PDF 등록</h2>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+    <form action="/" method="post" enctype="multipart/form-data">
+      <input type="file" name="pdf" accept="application/pdf" required>
+      <br><br>
+      <button type="submit">PDF 등록 및 챗팅 시작</button>
+    </form>
+  </div>
+</body>
+</html>
