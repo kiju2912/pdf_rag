@@ -56,8 +56,14 @@
   - **HuggingFace 모델**: 언어 모델을 통한 응답 생성 (예: Mixtral-8x7B-Instruct-v0.1[docling])
 
 - **이미지 캡셔닝 (image_caption.py)**  
-  - **BLIP 모델 (Salesforce)**: 이미지 캡션 자동 생성
-  - **ThreadPoolExecutor**: 다중 이미지 병렬 처리
+  - **BLIP 모델 (Salesforce)**: 추출된 영역을 이미지로 전환 해 해당 영역의 생김을 묘사합니다.
+  - ex:
+    File: Figure 2_1743059622915256000.png, Caption: a diagram of a single - line network
+    File: Figure 1_1743059622944652000.png, Caption: a black and white image of a line of lines
+    File: Figure 3_1743059622971095000.png, Caption: a diagram of a single - layered network
+    File: Figure 4_1743059622997886000.png, Caption: a diagram of a star with a circle of numbers
+    File: Figure 5_1743059623016995000.png, Caption: a diagram of a star with the number of stars
+  
 
 ---
 
