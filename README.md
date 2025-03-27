@@ -33,18 +33,18 @@
   - **MySQL**: PDF 문서 및 캡션, 영역 정보 저장
   - **Milvus**: 임베딩 벡터를 저장하고 유사도 검색을 지원하는 벡터 스토어
 
-- **PDF 처리 및 비텍스트 추출**  
+- **PDF 처리 및 비텍스트 추출(c.py)**  
   - **PyMuPDF(fitz)**: PDF 파일의 읽기 및 조작, 이미지/도형 영역 추출
-  - **c.py 모듈**:  
+  - **https://github.com/kiju2912/pdf_parser**:  
     - 텍스트 블록 분석, 캡션(figure/table) 검출  
     - 비텍스트 요소의 클러스터링 및 그룹화 (인접 요소 합치기, 겹침 영역 처리 등)
     - 클러스터 영역과 캡션 매칭, 별도 PDF/PNG 파일 저장 및 SQL 저장
 
-- **자연어 처리 및 RAG 파이프라인**  
+- **자연어 처리 및 RAG(lang_pipe_line.py) 파이프라인**  
   - **LangChain**: 질문-응답 체인 구성 및 문서 청킹
-  - **HuggingFace 모델**: 언어 모델을 통한 응답 생성 (예: Mixtral-8x7B-Instruct-v0.1)
+  - **HuggingFace 모델**: 언어 모델을 통한 응답 생성 (예: Mixtral-8x7B-Instruct-v0.1[docling])
 
-- **이미지 캡셔닝**  
+- **이미지 캡셔닝(image_caption.py)**  
   - **BLIP 모델 (Salesforce)**: 이미지 캡션 자동 생성
   - **ThreadPoolExecutor**: 다중 이미지 병렬 처리
 
