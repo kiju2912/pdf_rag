@@ -63,19 +63,14 @@
         } else {
           // 기본 답변 추가
           appendMessage('bot', data.answer);
-          // 만약 context 내에 source가 "sql"인 문서가 있다면, 다운로드 링크 추가
-          if (data.context && Array.isArray(data.context)) {
-            data.context.forEach(doc => {
-              console.log(data)
-              if (doc.metadata && doc.metadata.source === "sql" && doc.metadata.pdf_file_name) {
-                console.log("data")
-                // 다운로드 링크 URL: /download?file=<pdf_file_name>
-                const downloadUrl = `/download?file=${encodeURIComponent(doc.metadata.pdf_file_name)}`;
-                const linkText = doc.metadata.caption_name || "다운로드";
-                appendDownloadLink(linkText, downloadUrl);
-              }
-            });
+          // 만약 pdf_file_name,caption_name이 있다면, 다운로드 링크 추가
+          if (data.pdf_file_name !== '' &&data.pdf_file_name.indexOf('output') != -1) {
+              console.log("data");
+              const downloadUrl = `/download?file=${encodeURIComponent(data.pdf_file_name)}`;
+              const linkText = data.caption_name || "다운로드";
+              appendDownloadLink(linkText, downloadUrl);
           }
+
         }
       } catch (error) {
         appendMessage('bot', "서버 오류가 발생했습니다.");
@@ -93,10 +88,12 @@
     function appendDownloadLink(linkText, url) {
       const linkDiv = document.createElement('div');
       linkDiv.classList.add('bot-message');
-      linkDiv.innerHTML = `<a href="${url}" class="download-link" target="_blank">${linkText} 다운로드</a>`;
+      linkDiv.innerHTML = `<a href="${url}" class="download-link" target="_blank">${linkText} </a>`;
       chatBox.appendChild(linkDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>
+  <!-- <script src="../../js/chat.js"></script> -->
+
 </body>
 </html>

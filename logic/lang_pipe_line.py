@@ -17,10 +17,13 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.documents import Document
-import config
+
+# global_vactor_store = None
+
 # 환경변수 설정 및 토큰 로드
 load_dotenv()
-HF_TOKEN = os.getenv(config.HF_TOKEN)
+HF_TOKEN = os.getenv("HF_TOKEN")
+
 EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 print("환경변수 및 HuggingFace 토큰 로드 완료")
 
@@ -104,6 +107,7 @@ def build_rag_pipeline_for_pdf_id(pdf_id: int) -> object:
     SQL 메타데이터를 기반으로 Document 객체들을 생성하여 추가 문서로 합친 후,
     Milvus 벡터스토어와 RAG 체인을 구성한 후, 구축된 RAG 체인 객체를 반환합니다.
     """
+    # global global_vactor_store
     # 1. SQL에서 file_name 조회
     file_name = get_pdf_filename_from_sql(pdf_id)
     pdf_path = os.path.join("data", file_name)
@@ -140,47 +144,7 @@ def build_rag_pipeline_for_pdf_id(pdf_id: int) -> object:
     
     print(f"문서 청킹 완료: {len(splits)} 청크 생성됨")
     
-    # 3. SQL에서 해당 pdf_id와 관련된 모든 캡션 메타데이터 조회 및 Document 객체 생성
-    metadata_list = get_all_sql_metadata(pdf_id)
-    additional_docs = []
-    for meta in metadata_list:
-        doc_content = f'''
-            "caption_id": "{meta["caption_id"]}",
-            "caption_name": "{meta["caption_name"]}",
-            "pdf_id": "{meta["pdf_id"]}",
-            "page_number": "{meta["page_number"]}",
-            "caption_text": "{meta["caption_text"]}",
-            "x0": {meta["x0"]},
-            "y0": {meta["y0"]},
-            "x1": {meta["x1"]},
-            "y1": {meta["y1"]},
-            "appearance_description": "{meta["appearance_description"]}",
-            "pdf_file_name": "{meta["pdf_file_name"]}"
-        '''
-        additional_docs.append(
-            Document(
-                page_content=doc_content,
-                metadata={
-                    "source": "sql",
-                    "dl_meta": "",
-                    "caption_id": meta["caption_id"],
-                    "caption_name": meta["caption_name"],
-                    "pdf_id": meta["pdf_id"],
-                    "page_number": meta["page_number"],
-                    "caption_text": meta["caption_text"],
-                    "x0": meta["x0"],
-                    "y0": meta["y0"],
-                    "x1": meta["x1"],
-                    "y1": meta["y1"],
-                    "appearance_description": meta["appearance_description"],
-                    "pdf_file_name": meta["pdf_file_name"]
-                }
-            )
-        )
-    print(f"SQL 메타데이터 기반 추가 Document 객체 생성 완료: {len(additional_docs)}개")
-    
-    # 4. 벡터스토어 구축 (PDF 청킹 결과와 추가 문서를 합쳐서)
-    combined_docs = splits + additional_docs
+    # 3. 벡터스토어 구축 (PDF 청킹 결과와 추가 문서를 합쳐서)
     TOP_K = 3
     print("임베딩 모델 생성 시작")
     embedding = HuggingFaceEmbeddings(model_name=EMBED_MODEL_ID)
@@ -190,7 +154,7 @@ def build_rag_pipeline_for_pdf_id(pdf_id: int) -> object:
     print(f"Milvus 데이터베이스 생성 위치: {milvus_uri}")
     collection_name = f"docling_demo_{pdf_id}"
     vectorstore = Milvus.from_documents(
-        documents=combined_docs,
+        documents=splits,
         embedding=embedding,
         collection_name=collection_name,
         connection_args={"uri": milvus_uri},
@@ -201,7 +165,81 @@ def build_rag_pipeline_for_pdf_id(pdf_id: int) -> object:
         },
         drop_old=True
     )
+    # global_vactor_store = vectorstore
     
+    # 4. SQL에서 해당 pdf_id와 관련된 모든 캡션 메타데이터 조회 및 Document 객체 생성
+    metadata_list = get_all_sql_metadata(pdf_id)
+    additional_docs = []
+    for meta in metadata_list:
+        doc_content = f'''
+            this is summarized data for "{meta["caption_name"]}"
+            
+            "caption_name": "{meta["caption_name"]}",
+            "page_number": "{meta["page_number"]}",
+            "caption_text": "{meta["caption_text"]}",
+            "appearance_description": "{meta["appearance_description"]}",
+            
+        '''
+        
+        metadata = {
+            "dl_meta":{
+                "caption_name": meta["caption_name"],
+                "pdf_id": meta["pdf_id"],
+                "page_number": meta["page_number"],
+                "caption_text": meta["caption_text"],
+                "appearance_description": meta["appearance_description"],
+                "pdf_file_name": meta["pdf_file_name"]
+            },
+            "source": meta["pdf_file_name"]
+        }
+        additional_docs.append(
+            Document(
+                page_content=doc_content,
+                metadata=metadata
+            )
+        )
+    print(f"SQL 메타데이터 기반 추가 Document 객체 생성 완료: {len(additional_docs)}개")
+    # for additional_doc in additional_docs:
+    #     print(additional_doc)
+    uuids = [str(uuid4()) for _ in range(len(additional_docs))]
+    vectorstore.add_documents(documents=additional_docs, ids=uuids)
+    
+    # retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
+    
+    # # 5. 언어 모델 초기화 및 RAG 체인 생성
+    # GEN_MODEL_ID = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    # print("HuggingFaceEndpoint를 통한 언어 모델 초기화 시작")
+    # llm = HuggingFaceEndpoint(
+    #     repo_id=GEN_MODEL_ID,
+    #     huggingfacehub_api_token=HF_TOKEN,
+    #     task="text-generation",
+    # )
+    # print("언어 모델 초기화 완료")
+    
+    # PROMPT = PromptTemplate.from_template(
+    #     "Context information is below.\n---------------------\n{context}\n---------------------\n"
+    #     "Given the context information and not prior knowledge, answer the query.\n"
+    #     "Query: {input}\nAnswer:\n"
+    # )
+    # print("질문-응답 체인 생성 시작")
+    # question_answer_chain = create_stuff_documents_chain(llm, PROMPT)
+    # rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+    
+    # print("질문-응답 체인 생성 완료")
+
+    # pdf_results = vectorstore.similarity_search("explain Figure 4", k=1)
+    # for doc in pdf_results:
+    #     print("doc.metadata")
+    #     # print(f"내용2: {doc.page_content}")
+    #     print(f"pdf_file_name: {doc.metadata.get('pdf_file_name', '')}")
+    #     print(f"caption_name: {doc.metadata.get('caption_name', '')}")
+    #     # print(f"appearance_description: {doc.metadata.get('appearance_description', '')}")
+    #     print("---")
+    
+    return vectorstore
+
+def mk_rag_chain(vectorstore: object) -> object:
+    TOP_K = 3
     retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
     
     # 5. 언어 모델 초기화 및 RAG 체인 생성
@@ -222,11 +260,11 @@ def build_rag_pipeline_for_pdf_id(pdf_id: int) -> object:
     print("질문-응답 체인 생성 시작")
     question_answer_chain = create_stuff_documents_chain(llm, PROMPT)
     rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-    print("질문-응답 체인 생성 완료")
     
+    print("질문-응답 체인 생성 완료")
     return rag_chain
-
-def execute_question(rag_chain: object, question: str) -> dict:
+    
+def execute_question(vectorstore: object, question: str) -> dict:
     """
     구축된 RAG 체인을 사용하여 질문을 실행하고 결과를 반환합니다.
     
@@ -237,9 +275,30 @@ def execute_question(rag_chain: object, question: str) -> dict:
     Returns:
       - 질문 실행 결과 (dict)
     """
+    rag_chain = mk_rag_chain(vectorstore)
+    
     print("질문 실행 시작")
     resp_dict = rag_chain.invoke({"input": question})
     print("질문 실행 완료")
+    
+    # results2 = vectorstore.similarity_search(question, k=1)
+    # for doc in results2:  
+    #     resp_dict["pdf_file_name"] = doc.metadata.get('pdf_file_name', '')
+    #     resp_dict["caption_name"] = doc.metadata.get('caption_name', '')
+
+    #     print(f"pdf_file_name: {doc.metadata.get('pdf_file_name', '')}")
+    #     print(f"caption_name: {doc.metadata.get('caption_name', '')}")
+    #     print("---")
+    # results2 = global_vactor_store.similarity_search(question, k=1)
+    # for doc in results2:
+    #     print(f"내용: {doc.page_content}")
+    #     print(f"pdf_file_name: {doc.metadata.get('pdf_file_name', '')}")
+    #     print(f"caption_name: {doc.metadata.get('caption_name', '')}")
+    #     print(f"appearance_description: {doc.metadata.get('appearance_description', '')}")
+    #     print("---")
+
+    
+
     return resp_dict
 
 # 헬퍼 함수: Document 객체를 직렬화 가능한 dict로 변환
@@ -247,14 +306,15 @@ def serialize_document(doc: Document) -> dict:
     return {
         "page_content": doc.page_content,
         "metadata": doc.metadata
+
     }
 
 if __name__ == '__main__':
     # 모듈 단독 테스트용 (예시)
     test_pdf_id = 325
     test_question = "explain Figure 4"
-    rag_chain = build_rag_pipeline_for_pdf_id(test_pdf_id)
-    response = execute_question(rag_chain, test_question)
+    vectorstore = build_rag_pipeline_for_pdf_id(test_pdf_id)
+    response = execute_question(vectorstore, test_question)
     # context 내 Document 객체 직렬화
     if "context" in response:
         response["context"] = [serialize_document(doc) for doc in response["context"]]
