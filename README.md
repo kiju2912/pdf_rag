@@ -135,6 +135,47 @@
    - SQL 데이터베이스에 PDF, 캡션 및 영역 정보가 저장되어 추후 벡터 스토어(또는 RAG 파이프라인)에서 활용됩니다.
    - 채팅 인터페이스를 통해 사용자가 질문하면, RAG 파이프라인이 PDF 내 관련 문맥을 검색하여 자연어 응답을 제공합니다.
 
+## sql db
+ ```bash
+   CREATE TABLE `area` (
+  `area_id` int NOT NULL AUTO_INCREMENT,
+  `caption_id` int DEFAULT NULL,
+  `pdf_file_name` text,
+  `png_file_name` text,
+  `page_number` int NOT NULL,
+  `x0` double DEFAULT NULL,
+  `y0` double DEFAULT NULL,
+  `x1` double DEFAULT NULL,
+  `y1` double DEFAULT NULL,
+  `type` enum('figure','table') NOT NULL,
+  `appearance_description` text,
+  PRIMARY KEY (`area_id`),
+  KEY `caption_id` (`caption_id`),
+  CONSTRAINT `area_ibfk_1` FOREIGN KEY (`caption_id`) REFERENCES `captions` (`caption_id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2317 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `captions` (
+  `caption_id` int NOT NULL AUTO_INCREMENT,
+  `caption_name` text,
+  `pdf_id` int NOT NULL,
+  `page_number` int NOT NULL,
+  `caption_text` text,
+  `x0` double DEFAULT NULL,
+  `y0` double DEFAULT NULL,
+  `x1` double DEFAULT NULL,
+  `y1` double DEFAULT NULL,
+  PRIMARY KEY (`caption_id`),
+  KEY `pdf_id` (`pdf_id`),
+  CONSTRAINT `captions_ibfk_1` FOREIGN KEY (`pdf_id`) REFERENCES `pdf_documents` (`pdf_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5028 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `pdf_documents` (
+  `pdf_id` int NOT NULL AUTO_INCREMENT,
+  `file_name` text NOT NULL,
+  `processed_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pdf_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=378 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+```
 ---
 
 ## 향후 개선 방향
