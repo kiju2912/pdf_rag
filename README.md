@@ -46,7 +46,8 @@
 
 - **PDF 처리 및 비텍스트 추출 (c.py)**  
   - **PyMuPDF(fitz)**: PDF 파일의 읽기 및 조작, 이미지/도형 영역 추출
-  - **https://github.com/kiju2912/pdf_parser**:  
+  - **https://github.com/kiju2912/pdf_parser**:
+  - ![처리된 pdf](./clustered/4.pdf)  
     - 텍스트 블록 분석, 캡션(figure/table) 검출  
     - 비텍스트 요소의 클러스터링 및 그룹화 (인접 요소 합치기, 겹침 영역 처리 등)
     - 클러스터 영역과 캡션 매칭, 별도 PDF/PNG 파일 저장 및 SQL 저장
