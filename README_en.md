@@ -207,4 +207,5 @@ CREATE TABLE `pdf_documents` (
 
 This project proposes a new method for analyzing PDF documents by structurally extracting and clustering non-text elements without relying on traditional OCR techniques. By integrating textual and visual information into a unified system, it enables in-depth analysis of academic papers and complex documents. Coupled with a natural language Q&A pipeline and image captioning system, the platform offers a rich and interactive way to explore PDF contents. This makes it suitable for use in research demos, academic projects, and intelligent document processing tools.
 
+If you have any inquiries or suggestions regarding this project, please feel free to contact: **kiju2912@naver.com**
 
