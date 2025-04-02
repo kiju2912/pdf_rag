@@ -47,7 +47,7 @@ This project is a platform that effectively extracts and analyzes text and non-t
 
 - **PDF Processing and Non-Text Extraction (c.py)**  
   - **PyMuPDF (fitz)**: Reads and manipulates PDF files, extracts image/shape regions.
-  - **https://github.com/kiju2912/pdf_parser/README_en.md**
+  - **[https://github.com/kiju2912/pdf_parser/README_en.md](https://github.com/kiju2912/pdf_parser/blob/main/README_en.md)**
   - ![Processed PDF](./clustered/4.pdf)  
     - Analyzes text blocks and detects captions (figure/table).
     - Clusters and groups non-text elements (merging adjacent elements, overlapping regions, etc.)
