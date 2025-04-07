@@ -47,7 +47,7 @@ This project is a platform that effectively extracts and analyzes both textual a
 
 - **PDF and Non-Text Element Extraction (c.py)**  
   - **PyMuPDF (fitz)**: Reads and manipulates PDF files, extracts shapes/images  
-  - **Custom PDF Parser** ([github.com/kiju2912/pdf_parser](https://github.com/kiju2912/pdf_parser))  
+  - **Custom PDF Parser** ([[github.com/kiju2912/pdf_parser](https://github.com/kiju2912/pdf_parser)](https://github.com/kiju2912/pdf_parser/blob/main/README_en.md))  
     ![Processed PDF](./clustered/4.pdf)  
     - Text block and caption detection  
     - Clustering/grouping of non-textual elements (merging overlapping or nearby elements)  
