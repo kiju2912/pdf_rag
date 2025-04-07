@@ -55,7 +55,7 @@ This project is a platform that effectively extracts and analyzes both textual a
 
 - **Natural Language Processing (lang_pipe_line.py)**  
   - **LangChain**: Constructs document chains and manages chunking  
-  - **HuggingFace Models**: Generates answers from retrieved contexts (e.g., Mixtral-8x7B-Instruct-v0.1)
+  - **HuggingFace Models**: Generates answers from retrieved contexts (e.g., Mixtral-8x7B-Instruct-v0.1)[docling](https://arxiv.org/pdf/2408.09869)
 
 - **Image Captioning (image_caption.py)**  
   - **BLIP model (Salesforce)**: Generates visual descriptions for extracted image regions  
