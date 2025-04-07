@@ -54,7 +54,7 @@
 
 - **자연어 처리 및 RAG (lang_pipe_line.py) 파이프라인**  
   - **LangChain**: 질문-응답 체인 구성 및 문서 청킹
-  - **HuggingFace 모델**: 언어 모델을 통한 응답 생성 (예: Mixtral-8x7B-Instruct-v0.1[docling])
+  - **HuggingFace 모델**: 언어 모델을 통한 응답 생성 (예: Mixtral-8x7B-Instruct-v0.1[docling])(https://arxiv.org/pdf/2408.09869)
 
 - **이미지 캡셔닝 (image_caption.py)**  
   - **BLIP 모델 (Salesforce)**: 추출된 영역을 이미지로 전환 해 해당 영역의 생김을 묘사합니다.
