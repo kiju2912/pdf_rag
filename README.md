@@ -59,7 +59,7 @@
 - **이미지 캡셔닝 (image_caption.py)**  
   - **BLIP 모델 (Salesforce)**: 추출된 영역을 이미지로 전환 해 해당 영역의 생김을 묘사합니다.
   - ex:
-    - ![Figure 2_1743059622915256000.png](./output/png/4/Figure 2_1743059622915256000.png)
+    - ![Figure 2_1743059622915256000.png](.output/png/4/Figure%2_1743060248561434000.png)
     - Caption: a diagram of a single - line network
     
     
