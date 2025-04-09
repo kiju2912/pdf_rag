@@ -60,7 +60,7 @@ This project is a platform that effectively extracts and analyzes both textual a
 - **Image Captioning (image_caption.py)**  
   - **BLIP model (Salesforce)**: Generates visual descriptions for extracted image regions  
   - Example:  
-    - File: `Figure 2_1743059622915256000.png`  
+    - ![Figure 2](./output/png/4/Figure%202_1743060248561434000.png)
     - Caption: *"A diagram of a single-line network"*
 
 ---
