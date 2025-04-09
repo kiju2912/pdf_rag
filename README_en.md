@@ -58,7 +58,8 @@ This project is a platform that effectively extracts and analyzes both textual a
   - **HuggingFace Models**: Generates answers from retrieved contexts (e.g., Mixtral-8x7B-Instruct-v0.1)[docling](https://arxiv.org/pdf/2408.09869)
 
 - **Image Captioning (image_caption.py)**  
-  - **BLIP model (Salesforce)**: Generates visual descriptions for extracted image regions  
+  - **BLIP model (Salesforce)**: Generates visual descriptions for extracted image regions
+  - ([[BLIP](https://arxiv.org/pdf/2201.12086))]
   - Example:  
     - ![Figure 2](./output/png/4/Figure%202_1743060248561434000.png)
     - Caption: *"A diagram of a single-line network"*
